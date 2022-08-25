@@ -2,21 +2,13 @@
 
 namespace com\peterbodnar\bsqr\utils;
 
-use com\peterbodnar\cmd\Command;
-use com\peterbodnar\cmd\CommandException;
-
 
 /**
  * BySquare Lzma compressor / decompressor
  */
 class Lzma
 {
-
-
-	/** @var Command */
-	protected $command;
-	/** @var string[] */
-	protected $xzArgs;
+	private string $xzPath;
 
 
 	/**
@@ -24,11 +16,7 @@ class Lzma
 	 */
 	public function __construct($xzPath = "/usr/bin/xz")
 	{
-		$this->command = new Command($xzPath);
-		$this->xzArgs = [
-			"--format" => "raw",
-			"--lzma1" => "lc=3,lp=0,pb=2,dict=32KiB"
-		];
+		$this->xzPath = $xzPath;
 	}
 
 
@@ -44,20 +32,31 @@ class Lzma
 		$errorMsg = "Data compression failed";
 		$sizeBytesLE = pack("v", strlen($data));
 
-		$args = array_merge($this->xzArgs, ["-c", "-"]);
 		try {
-			$result = $this->command->execute($args, $data);
-		} catch (CommandException $ex) {
+			$command = new \Symfony\Component\Process\Process(
+				[
+					$this->xzPath,
+					'--format' => 'raw',
+					'--lzma1' => 'lc=3,lp=0,pb=2,dict=32KiB',
+					'-c',
+					'-'
+				], null, null,
+				$data
+			);
+			$exitCode = $command->run();
+			$stdErr = $command->getErrorOutput();
+		} catch (\Symfony\Component\Process\Exception\ProcessFailedException $ex) {
 			throw new LzmaException($errorMsg . ": " . $ex->getMessage(), 0, $ex);
 		}
-		$errorMsg .= " [" . $result->exitCode . "]";
-		if ("" !== $result->stdErr) {
-			throw new LzmaException($errorMsg . ": " . $result->stdErr);
+		$errorMsg .= " [" . $exitCode . "]";
+		if ("" !== $stdErr) {
+			throw new LzmaException($errorMsg . ": " . $stdErr);
 		}
-		if (0 !== $result->exitCode) {
+		if (0 !== $exitCode) {
 			throw new LzmaException($errorMsg);
 		}
-		return $sizeBytesLE . $result->stdOut;
+
+		return $sizeBytesLE . $command->getOutput();
 	}
 
 
@@ -75,19 +74,32 @@ class Lzma
 		$dataCompressed = substr($data, 2);
 		$size = unpack("v", $sizeBytesLE)[1];
 
-		$args = array_merge($this->xzArgs, ["--decompress", "-c", "-"]);
 		try {
-			$result = $this->command->execute($args, $dataCompressed);
-		} catch (CommandException $ex) {
+			$command = new \Symfony\Component\Process\Process(
+				[
+					$this->xzPath,
+					'--format' => 'raw',
+					'--lzma1' => 'lc=3,lp=0,pb=2,dict=32KiB',
+					'--decompress',
+					'-c',
+					'-'
+				], null, null,
+				$dataCompressed
+			);
+			$exitCode = $command->run();
+			$stdErr = $command->getErrorOutput();
+			$stdOut = $command->getOutput();
+		} catch (\Symfony\Component\Process\Exception\ProcessFailedException $ex) {
 			throw new LzmaException($errorMsg . ": " . $ex->getMessage(), 0, $ex);
 		}
-		if (strlen($result->stdOut) === $size) {
-			return $result->stdOut;
+		if (strlen($stdOut) === $size) {
+			return $stdOut;
 		}
-		$errorMsg .= " [" . $result->exitCode . "]";
-		if ("" !== $result->stdErr) {
-			$errorMsg .= ": " . $result->stdErr;
+		$errorMsg .= " [" . $exitCode . "]";
+		if ("" !== $stdErr) {
+			$errorMsg .= ": " . $stdErr;
 		}
+
 		throw new LzmaException($errorMsg);
 	}
 

@@ -1,17 +1,34 @@
 {
-	"name": "peterbodnar.com/bsqr",
-	"description": "By Square document encoding, parsing and rendering utilities",
-	"keywords": ["bysquare", "paybysquare"],
-	"license": ["BSD-3-Clause", "GPL-2.0", "GPL-3.0"],
-	"autoload": {"psr-4": {"com\\peterbodnar\\bsqr\\": "src/"}},
-	"require": {
-		"php": "^7.4 || ^8.0",
-		"peterbodnar.com/base32": "^1.0",
-		"peterbodnar.com/cmd": "^1.0",
-		"peterbodnar.com/mx2svg": "^1.0",
-		"peterbodnar.com/qrcoder": "^1.0"
-	},
-	"require-dev": {
-		"nette/tester": "^1.7"
+  "name": "peterbodnar.com/bsqr",
+  "description": "By Square document encoding, parsing and rendering utilities",
+  "keywords": [
+	"bysquare",
+	"paybysquare"
+  ],
+  "license": [
+	"BSD-3-Clause",
+	"GPL-2.0",
+	"GPL-3.0"
+  ],
+  "autoload": {
+	"psr-4": {
+	  "com\\peterbodnar\\bsqr\\": "src/"
 	}
+  },
+  "require": {
+	"php": "^7.4 || ^8.0",
+	"composer/composer": "^2.0.0",
+	"peterbodnar.com/mx2svg": "^1.0",
+	"peterbodnar.com/qrcoder": "^1.0",
+	"symfony/process": "^5.4 || ^6.0",
+	"paragonie/constant_time_encoding": "^2.6"
+  },
+  "scripts": {
+	"post-install-cmd": [
+	  "\\com\\peterbodnar\\bsqr\\composer\\CheckSystemExecutables::check"
+	],
+	"post-update-cmd": [
+	  "\\com\\peterbodnar\\bsqr\\composer\\CheckSystemExecutables::check"
+	]
+  }
 }
