@@ -18,10 +18,10 @@
   "require": {
 	"php": "^7.4 || ^8.0",
 	"composer/composer": "^2.0.0",
+	"endroid/qr-code": "^4.5",
+	"paragonie/constant_time_encoding": "^2.6",
 	"peterbodnar.com/mx2svg": "^1.0",
-	"peterbodnar.com/qrcoder": "^1.0",
-	"symfony/process": "^5.4 || ^6.0",
-	"paragonie/constant_time_encoding": "^2.6"
+	"symfony/process": "^5.4 || ^6.0"
   },
   "scripts": {
 	"post-install-cmd": [

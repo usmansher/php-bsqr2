@@ -2,8 +2,6 @@
 
 namespace com\peterbodnar\bsqr\utils;
 
-use com\peterbodnar\base32\Base32;
-use com\peterbodnar\base32\Base32Exception;
 use com\peterbodnar\bsqr\model;
 
 
@@ -12,9 +10,6 @@ use com\peterbodnar\bsqr\model;
  */
 class BsqrCoder
 {
-
-	/** @var Base32 - Base 32 encoder / decoder. */
-	protected $base32;
 	/** @var ClientDataEncoder - BySquare serializer. */
 	protected $cldEncoder;
 	/** @var ClientDataParser - BySquare parser. */
@@ -37,7 +32,6 @@ class BsqrCoder
 
 	public function __construct()
 	{
-		$this->base32 = new Base32("0123456789ABCDEFGHIJKLMNOPQRSTUV");
 		$this->cldEncoder = new ClientDataEncoder();
 		$this->cldParser = new ClientDataParser();
 		$this->lzma = new Lzma();
@@ -47,18 +41,14 @@ class BsqrCoder
 	/**
 	 * Encode document.
 	 *
-	 * @param model\Document $document - Document to encode.
+	 * @param model\Pay $document - Document to encode.
 	 * @return string
 	 * @throws BsqrCoderException
 	 */
-	public function encode(model\Document $document)
+	public function encode(model\Pay $document)
 	{
-		if ($document instanceof model\Pay) {
-			$head = "\x00\x00";
-			$clientData = $this->cldEncoder->encodePay($document);
-		} else {
-			throw new BsqrCoderException("Not supported");
-		}
+		$head = "\x00\x00";
+		$clientData = $this->cldEncoder->encodePay($document);
 
 		$clDataHash = $this->crc32hash($clientData);
 		try {
@@ -67,7 +57,7 @@ class BsqrCoder
 			throw new BsqrCoderException("LZMA compression failed: " . $ex->getMessage(), 0, $ex);
 		}
 
-		return $this->base32->encode($head . $lzmEncoded);
+		return \ParagonIE\ConstantTime\Base32::encode($head . $lzmEncoded);
 	}
 
 
@@ -81,8 +71,8 @@ class BsqrCoder
 	public function parse($input)
 	{
 		try {
-			$b32decoded = $this->base32->decode($input);
-		} catch (Base32Exception $ex) {
+			$b32decoded = \ParagonIE\ConstantTime\Base32::decode($input);
+		} catch (\Exception $ex) {
 			throw new BsqrCoderException("Base 32 decoding failed: " . $ex->getMessage(), 0, $ex);
 		}
 
