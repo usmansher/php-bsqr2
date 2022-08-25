@@ -3,11 +3,11 @@
 namespace com\peterbodnar\bsqr\model;
 
 
-
 /**
  * Pay Base
  */
-abstract class PayBase extends Document {
+abstract class PayBase extends Document
+{
 
 
 	/** @var string|null - Invoice identification code. Only used when pay by square is part of the invoice. Otherwise this field is empty. */
@@ -22,7 +22,8 @@ abstract class PayBase extends Document {
 	 * @param string|null $invoiceId
 	 * @return static
 	 */
-	public function setInvoiceId($invoiceId) {
+	public function setInvoiceId($invoiceId)
+	{
 		$this->invoiceId = $invoiceId;
 		return $this;
 	}
@@ -34,7 +35,8 @@ abstract class PayBase extends Document {
 	 * @param Payment $payment
 	 * @return static
 	 */
-	public function addPayment(Payment $payment) {
+	public function addPayment(Payment $payment)
+	{
 		$this->payments[] = $payment;
 		return $this;
 	}

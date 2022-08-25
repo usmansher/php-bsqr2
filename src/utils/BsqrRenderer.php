@@ -2,15 +2,14 @@
 
 namespace com\peterbodnar\bsqr\utils;
 
-use com\peterbodnar\bsqr\Exception;
 use com\peterbodnar\svg\Svg;
-
 
 
 /**
  * Bysquare image renderer
  */
-class BsqrRenderer {
+class BsqrRenderer
+{
 
 
 	const LOGO_NONE = "NONE";
@@ -25,7 +24,7 @@ class BsqrRenderer {
 	/** @var string */
 	protected $unit = "";
 	/** @var bool */
-	protected $showBorder = TRUE;
+	protected $showBorder = true;
 	/** @var string */
 	protected $logoPosition = self::LOGO_BOTTOM;
 	/** @var string */
@@ -49,10 +48,10 @@ class BsqrRenderer {
 	 * @param string $name - Name of svg image
 	 * @return string
 	 */
-	protected function includeSvg($name) {
+	protected function includeSvg($name)
+	{
 		$res = preg_replace("~^<svg[^>]*?>(.*)</svg>$~", "\${1}", file_get_contents(__DIR__ . "/../../res/" . $name));
-		$res = str_replace(["{primary}", "{secondary}"], [$this->colorPrimary, $this->colorSecondary], $res);
-		return $res;
+		return str_replace(["{primary}", "{secondary}"], [$this->colorPrimary, $this->colorSecondary], $res);
 	}
 
 
@@ -63,7 +62,8 @@ class BsqrRenderer {
 	 * @param float|null $qaRatio - Ratio of quite area size to qrcode square size
 	 * @return void
 	 */
-	public function setQrCodeSvg(Svg $qrCodeSvg, $qaRatio = null) {
+	public function setQrCodeSvg(Svg $qrCodeSvg, $qaRatio = null)
+	{
 		$this->qrSvg = $qrCodeSvg;
 		if (null !== $qaRatio) {
 			$this->setQuiteAreaRatio($qaRatio);
@@ -77,7 +77,8 @@ class BsqrRenderer {
 	 * @param float $qaRatio - Quite area size ratio
 	 * @return void
 	 */
-	public function setQuiteAreaRatio($qaRatio) {
+	public function setQuiteAreaRatio($qaRatio)
+	{
 		$this->qaRatio = $qaRatio;
 	}
 
@@ -85,12 +86,13 @@ class BsqrRenderer {
 	/**
 	 * Set logo type and position.
 	 *
-	 * @param string|LOGO_* $logo - Logo
-	 * @param string|LOGO_*|null $logoPosition - Logo position
+	 * @param string $logo - Logo
+	 * @param string|null $logoPosition - Logo position
 	 */
-	public function setLogo($logo, $logoPosition = NULL) {
+	public function setLogo($logo, $logoPosition = null)
+	{
 		$this->logo = $logo;
-		if (NULL !== $logoPosition) {
+		if (null !== $logoPosition) {
 			$this->logoPosition = $logoPosition;
 		}
 	}
@@ -102,7 +104,8 @@ class BsqrRenderer {
 	 * @param string $logoPosition
 	 * @return void
 	 */
-	public function setLogoPosition($logoPosition) {
+	public function setLogoPosition($logoPosition)
+	{
 		$this->logoPosition = $logoPosition;
 	}
 
@@ -113,7 +116,8 @@ class BsqrRenderer {
 	 * @param bool $showBorder - Set TRUE to render border.
 	 * @return void
 	 */
-	public function setBorder($showBorder) {
+	public function setBorder($showBorder)
+	{
 		$this->showBorder = $showBorder;
 	}
 
@@ -125,7 +129,8 @@ class BsqrRenderer {
 	 * @param string $secondaryColor - Secondary color
 	 * @return void
 	 */
-	public function setColors($primaryColor, $secondaryColor) {
+	public function setColors($primaryColor, $secondaryColor)
+	{
 		$this->colorPrimary = $primaryColor;
 		$this->colorSecondary = $secondaryColor;
 	}
@@ -140,14 +145,15 @@ class BsqrRenderer {
 	 * @param Svg $svg - Image to render.
 	 * @return string
 	 */
-	protected function renderQrCode(array $pos, $size, $rotate, Svg $svg) {
+	protected function renderQrCode(array $pos, $size, $rotate, Svg $svg)
+	{
 		$transform = "translate(" . ($pos[0]) . "," . ($pos[1]) . ")";
 		if (0 !== $rotate) {
 			$transform .= " rotate(" . $rotate . "," . ($size / 2) . "," . ($size / 2) . ")";
 		}
 		return
-			"<g transform=\"{$transform}\">" .
-			((string) $svg->withSize($size, $size)) .
+			"<g transform=\"$transform\">" .
+			((string)$svg->withSize($size, $size)) .
 			"</g>";
 	}
 
@@ -161,7 +167,8 @@ class BsqrRenderer {
 	 * @param bool $noLogo - Set true to keep no gap for logo
 	 * @return string
 	 */
-	protected function renderBorder(array $pos, $size, $width, $noLogo) {
+	protected function renderBorder(array $pos, $size, $width, $noLogo)
+	{
 		$wh = $width * 0.5;
 		$x1 = $pos[0] - $wh;
 		$y1 = $pos[1] - $wh;
@@ -171,17 +178,17 @@ class BsqrRenderer {
 		$b = $wh + $size * 0.045;
 
 		if ($noLogo) {
-			$path = "M{$x1} {$y1}V{$y2}H{$x2}V{$y1}z";
+			$path = "M$x1 {$y1}V{$y2}H{$x2}V{$y1}z";
 		} elseif (self::LOGO_LEFT === $this->logoPosition) {
-			$path = "M{$x1} " . ($y1 + $a) . "V{$y2}H{$x2}V{$y1}H" . ($x1 + $b);
+			$path = "M$x1 " . ($y1 + $a) . "V{$y2}H{$x2}V{$y1}H" . ($x1 + $b);
 		} elseif (self::LOGO_RIGHT === $this->logoPosition) {
-			$path = "M{$x2} " . ($y1 + $a) . "V{$y2}H{$x1}V{$y1}H" . ($x2 - $b);
+			$path = "M$x2 " . ($y1 + $a) . "V{$y2}H{$x1}V{$y1}H" . ($x2 - $b);
 		} elseif (self::LOGO_TOP === $this->logoPosition) {
-			$path = "M". ($x2 - $a) . " {$y1}H{$x1}V{$y2}H{$x2}V" . ($y1 + $b);
+			$path = "M" . ($x2 - $a) . " {$y1}H{$x1}V{$y2}H{$x2}V" . ($y1 + $b);
 		} else /* if (self::LOGO_BOTTOM === $this->logoPosition) */ {
-			$path = "M". ($x2 - $a) . " {$y2}H{$x1}V{$y1}H{$x2}V" . ($y2 - $b);
+			$path = "M" . ($x2 - $a) . " {$y2}H{$x1}V{$y1}H{$x2}V" . ($y2 - $b);
 		}
-		return "<path d=\"{$path}\" style=\"fill:none;stroke:{$this->colorPrimary};stroke-width:{$width};stroke-linecap:round;stroke-linejoin:round\"/>";
+		return "<path d=\"$path\" style=\"fill:none;stroke:$this->colorPrimary;stroke-width:$width;stroke-linecap:round;stroke-linejoin:round\"/>";
 	}
 
 
@@ -195,7 +202,8 @@ class BsqrRenderer {
 	 * @return string
 	 * @throws BsqrRendererException
 	 */
-	protected function renderLogo(array $pos, $size, $mirror, $logo) {
+	protected function renderLogo(array $pos, $size, $mirror, $logo)
+	{
 		if (self::LOGO_PAY === $logo) {
 			$resName = "pay-logo.svg";
 		} else {
@@ -207,7 +215,7 @@ class BsqrRenderer {
 			$scalex *= -1.0;
 		}
 		return
-			"<g transform=\"translate({$pos[0]}, {$pos[1]}) scale({$scalex}, {$scaley})\">" .
+			"<g transform=\"translate($pos[0], $pos[1]) scale($scalex, $scaley)\">" .
 			$this->includeSvg($resName) .
 			"</g>";
 	}
@@ -222,7 +230,8 @@ class BsqrRenderer {
 	 * @return string
 	 * @throws BsqrRendererException
 	 */
-	protected function renderCaption(array $pos, $size, $logo) {
+	protected function renderCaption(array $pos, $size, $logo)
+	{
 		if (self::LOGO_PAY === $logo) {
 			$resName = "pay-caption.svg";
 		} else {
@@ -231,7 +240,7 @@ class BsqrRenderer {
 		$scale = $size / 100.0;
 
 		return
-			"<g transform=\"translate({$pos[0]}, {$pos[1]}) scale({$scale})\">" .
+			"<g transform=\"translate($pos[0], $pos[1]) scale($scale)\">" .
 			$this->includeSvg($resName) .
 			"</g>";
 	}
@@ -243,7 +252,8 @@ class BsqrRenderer {
 	 * @return Svg
 	 * @throws BsqrRendererException
 	 */
-	public function render() {
+	public function render()
+	{
 		$noLogo = (self::LOGO_NONE === $this->logo);
 		$baseSize = 1000.0;
 		$logoSize = $baseSize * 0.213416;
@@ -254,7 +264,6 @@ class BsqrRenderer {
 
 		$size = [$baseSize, $baseSize];
 		$basePos = [0.0, 0.0];
-		$logoPos = null;
 		$logoMirror = false;
 		$captionPos = null;
 		$qrRotate = 0;
@@ -268,9 +277,7 @@ class BsqrRenderer {
 			$logoOffset -= $bw;
 		}
 
-		if ($noLogo) {
-			//
-		} elseif (self::LOGO_LEFT === $this->logoPosition) {
+		if (self::LOGO_LEFT === $this->logoPosition) {
 			$basePos[0] += $logoOffset;
 			$logoPos = [0.0, $bwh];
 			$logoMirror = true;
@@ -292,7 +299,7 @@ class BsqrRenderer {
 		}
 
 		$content = "";
-		if (NULL !== $this->qrSvg) {
+		if (null !== $this->qrSvg) {
 			$qOffset = $baseSize * $this->qaRatio;
 			$qrSize = $baseSize - 2 * $qOffset;
 			$qrPos = [$basePos[0] + $qOffset, $basePos[1] + $qOffset];
@@ -305,14 +312,7 @@ class BsqrRenderer {
 			$content .= $this->renderLogo($logoPos, $logoSize, $logoMirror, $this->logo);
 			$content .= $this->renderCaption($captionPos, $captionSize, $this->logo);
 		}
-		return new Svg($content, ["viewBox" => "0 0 {$size[0]} {$size[1]}"]);
+		return new Svg($content, ["viewBox" => "0 0 $size[0] $size[1]"]);
 	}
 
 }
-
-
-
-/**
- * Exception thrown when
- */
-class BsqrRendererException extends Exception { }

@@ -5,11 +5,11 @@ namespace com\peterbodnar\bsqr\utils;
 use com\peterbodnar\bsqr\model;
 
 
-
 /**
  * BySquare client data encoder
  */
-class ClientDataEncoder {
+class ClientDataEncoder
+{
 
 
 	/** @var string */
@@ -19,10 +19,11 @@ class ClientDataEncoder {
 	/**
 	 * Encode string value.
 	 *
-	 * @param string - Value
+	 * @param string $value - Value
 	 * @return string
 	 */
-	protected function encodeValue($value) {
+	protected function encodeValue($value)
+	{
 		return str_replace($this->separator, " ", $value);
 	}
 
@@ -30,10 +31,11 @@ class ClientDataEncoder {
 	/**
 	 * Encode date.
 	 *
-	 * @param string - Date
+	 * @param string $date - Date
 	 * @return string
 	 */
-	protected function encodeDate($date) {
+	protected function encodeDate($date)
+	{
 		return $this->encodeValue(str_replace("-", "", $date));
 	}
 
@@ -44,7 +46,8 @@ class ClientDataEncoder {
 	 * @param model\BankAccount $bankAccount - Bank account
 	 * @return string
 	 */
-	protected function encodeBankAccount(model\BankAccount $bankAccount) {
+	protected function encodeBankAccount(model\BankAccount $bankAccount)
+	{
 		return implode($this->separator, [
 			$this->encodeValue($bankAccount->iban),
 			$this->encodeValue($bankAccount->bic),
@@ -58,7 +61,8 @@ class ClientDataEncoder {
 	 * @param model\StandingOrderExt $standingOrderExt - Standing order extension
 	 * @return string
 	 */
-	protected function encodeStandingOrderExt(model\StandingOrderExt $standingOrderExt) {
+	protected function encodeStandingOrderExt(model\StandingOrderExt $standingOrderExt)
+	{
 		$d = $standingOrderExt->day; // todo
 		$m = $standingOrderExt->month; // todo
 		$p = $standingOrderExt->periodicity; // todo
@@ -78,7 +82,8 @@ class ClientDataEncoder {
 	 * @param model\DirectDebitExt $directDebitExt - Direct debit extension
 	 * @return string
 	 */
-	protected function encodeDirectDebitExt(model\DirectDebitExt $directDebitExt) {
+	protected function encodeDirectDebitExt(model\DirectDebitExt $directDebitExt)
+	{
 		return implode($this->separator, [
 			$this->encodeValue($directDebitExt->scheme),
 			$this->encodeValue($directDebitExt->type),
@@ -100,7 +105,8 @@ class ClientDataEncoder {
 	 * @param model\Payment $payment - Payment
 	 * @return string
 	 */
-	protected function encodePayment(model\Payment $payment) {
+	protected function encodePayment(model\Payment $payment)
+	{
 		$options = 0;
 		if ($payment->paymentOrderOption) {
 			$options |= 1;
@@ -144,7 +150,8 @@ class ClientDataEncoder {
 	 * @param model\Pay $pay - Pay document
 	 * @return string
 	 */
-	public function encodePay(model\Pay $pay) {
+	public function encodePay(model\Pay $pay)
+	{
 		$values = [
 			$this->encodeValue($pay->invoiceId),
 			$this->encodeValue(count($pay->payments)),

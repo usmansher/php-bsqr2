@@ -3,12 +3,12 @@
 namespace com\peterbodnar\bsqr\model;
 
 
-
 /**
  * Direct debit extension.
  * Extends basic payment information with information required for identification and setup of direct debit.
  */
-class DirectDebitExt extends Element {
+class DirectDebitExt extends Element
+{
 
 
 	const SCHEME_SEPA = "SEPA";

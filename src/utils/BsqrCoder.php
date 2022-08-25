@@ -4,16 +4,14 @@ namespace com\peterbodnar\bsqr\utils;
 
 use com\peterbodnar\base32\Base32;
 use com\peterbodnar\base32\Base32Exception;
-use com\peterbodnar\bsqr\Exception;
 use com\peterbodnar\bsqr\model;
-
 
 
 /**
  * Bysquare data encoder / parser
  */
-class BsqrCoder {
-
+class BsqrCoder
+{
 
 	/** @var Base32 - Base 32 encoder / decoder. */
 	protected $base32;
@@ -31,12 +29,14 @@ class BsqrCoder {
 	 * @param string $data
 	 * @return string
 	 */
-	protected function crc32hash($data) {
-		return strrev(hash("crc32b", $data, TRUE));
+	protected function crc32hash($data)
+	{
+		return strrev(hash("crc32b", $data, true));
 	}
 
 
-	public function __construct() {
+	public function __construct()
+	{
 		$this->base32 = new Base32("0123456789ABCDEFGHIJKLMNOPQRSTUV");
 		$this->cldEncoder = new ClientDataEncoder();
 		$this->cldParser = new ClientDataParser();
@@ -51,7 +51,8 @@ class BsqrCoder {
 	 * @return string
 	 * @throws BsqrCoderException
 	 */
-	public function encode(model\Document $document) {
+	public function encode(model\Document $document)
+	{
 		if ($document instanceof model\Pay) {
 			$head = "\x00\x00";
 			$clientData = $this->cldEncoder->encodePay($document);
@@ -65,9 +66,8 @@ class BsqrCoder {
 		} catch (LzmaException $ex) {
 			throw new BsqrCoderException("LZMA compression failed: " . $ex->getMessage(), 0, $ex);
 		}
-		$b32encoded = $this->base32->encode($head . $lzmEncoded);
 
-		return $b32encoded;
+		return $this->base32->encode($head . $lzmEncoded);
 	}
 
 
@@ -78,7 +78,8 @@ class BsqrCoder {
 	 * @return model\Document
 	 * @throws BsqrCoderException
 	 */
-	public function parse($input) {
+	public function parse($input)
+	{
 		try {
 			$b32decoded = $this->base32->decode($input);
 		} catch (Base32Exception $ex) {
@@ -114,10 +115,3 @@ class BsqrCoder {
 	}
 
 }
-
-
-
-/**
- * Exception thrown when document encoding / parsing error occures
- */
-class BsqrCoderException extends Exception { }

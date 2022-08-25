@@ -3,12 +3,12 @@
 namespace com\peterbodnar\bsqr\model;
 
 
-
 /**
  * Standing order extension.
  * Extends basic payment information with information required for standing order setup.
  */
-class StandingOrderExt extends Element {
+class StandingOrderExt extends Element
+{
 
 
 	/** @var int|null - This is the payment day. It‘s meaning depends on the periodicity, meaning either day of the month (number between 1 and 31) or day of the week (1=Monday, 2=Tuesday, …, 7=Sunday). */

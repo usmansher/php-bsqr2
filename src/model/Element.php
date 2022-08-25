@@ -3,8 +3,9 @@
 namespace com\peterbodnar\bsqr\model;
 
 
-
 /**
  * Element
  */
-abstract class Element { }
+abstract class Element
+{
+}

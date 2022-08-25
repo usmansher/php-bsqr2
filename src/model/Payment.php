@@ -3,15 +3,15 @@
 namespace com\peterbodnar\bsqr\model;
 
 
-
 /**
  * Payment order definition
  */
-class Payment extends Element {
+class Payment extends Element
+{
 
 
 	/** @var bool */
-	public $paymentOrderOption = TRUE;
+	public $paymentOrderOption = true;
 	/** @var int|null - Payment amount. */
 	public $amount;
 	/** @var string - Payment currency code, 3 letter ISO4217 code. */
@@ -42,7 +42,8 @@ class Payment extends Element {
 	 * @param bool $paymentOrderOption
 	 * @return static
 	 */
-	public function setPaymentOrderOption($paymentOrderOption = TRUE) {
+	public function setPaymentOrderOption($paymentOrderOption = true)
+	{
 		$this->paymentOrderOption = $paymentOrderOption;
 		return $this;
 	}
@@ -55,9 +56,10 @@ class Payment extends Element {
 	 * @param string|NULL $currencyCode
 	 * @return static
 	 */
-	public function setAmount($amount, $currencyCode = NULL) {
+	public function setAmount($amount, $currencyCode = null)
+	{
 		$this->amount = $amount;
-		if (NULL !== $currencyCode) {
+		if (null !== $currencyCode) {
 			$this->setCurrencyCode($currencyCode);
 		}
 		return $this;
@@ -70,7 +72,8 @@ class Payment extends Element {
 	 * @param string $currencyCode
 	 * @return static
 	 */
-	public function setCurrencyCode($currencyCode) {
+	public function setCurrencyCode($currencyCode)
+	{
 		$this->currencyCode = $currencyCode;
 		return $this;
 	}
@@ -82,7 +85,8 @@ class Payment extends Element {
 	 * @param string|null $dueDate
 	 * @return static
 	 */
-	public function setDueDate($dueDate) {
+	public function setDueDate($dueDate)
+	{
 		$this->dueDate = $dueDate;
 		return $this;
 	}
@@ -94,7 +98,8 @@ class Payment extends Element {
 	 * @param string|null $variableSymbol
 	 * @return static
 	 */
-	public function setVariableSymbol($variableSymbol) {
+	public function setVariableSymbol($variableSymbol)
+	{
 		$this->variableSymbol = $variableSymbol;
 		return $this;
 	}
@@ -106,7 +111,8 @@ class Payment extends Element {
 	 * @param string|null $constantSymbol
 	 * @return static
 	 */
-	public function setConstantSymbol($constantSymbol) {
+	public function setConstantSymbol($constantSymbol)
+	{
 		$this->constantSymbol = $constantSymbol;
 		return $this;
 	}
@@ -118,7 +124,8 @@ class Payment extends Element {
 	 * @param string|null $specificSymbol
 	 * @return static
 	 */
-	public function setSpecificSymbol($specificSymbol) {
+	public function setSpecificSymbol($specificSymbol)
+	{
 		$this->specificSymbol = $specificSymbol;
 		return $this;
 	}
@@ -132,7 +139,8 @@ class Payment extends Element {
 	 * @param string|null $specificSymbol
 	 * @return static
 	 */
-	public function setSymbols($variableSymbol, $constantSymbol, $specificSymbol = NULL) {
+	public function setSymbols($variableSymbol, $constantSymbol, $specificSymbol = null)
+	{
 		$this->variableSymbol = $variableSymbol;
 		$this->constantSymbol = $constantSymbol;
 		if (func_num_args() > 2) {
@@ -148,7 +156,8 @@ class Payment extends Element {
 	 * @param string|null $originatorsReferenceInformation
 	 * @return static
 	 */
-	public function setOriginatorsReferenceInformation($originatorsReferenceInformation) {
+	public function setOriginatorsReferenceInformation($originatorsReferenceInformation)
+	{
 		$this->originatorsReferenceInformation = $originatorsReferenceInformation;
 		return $this;
 	}
@@ -160,7 +169,8 @@ class Payment extends Element {
 	 * @param string|null $note
 	 * @return static
 	 */
-	public function setNote($note) {
+	public function setNote($note)
+	{
 		$this->note = $note;
 		return $this;
 	}
@@ -169,11 +179,12 @@ class Payment extends Element {
 	/**
 	 * Add bank account.
 	 *
-	 * @param BankAccount|string $bankAccount
+	 * @param BankAccount|string $accountOrIban
 	 * @param string|null $bicOrNull
 	 * @return static
 	 */
-	public function addBankAccount($accountOrIban, $bicOrNull = NULL) {
+	public function addBankAccount($accountOrIban, $bicOrNull = null)
+	{
 		if ($accountOrIban instanceof BankAccount) {
 			$this->bankAccounts[] = $accountOrIban;
 		} else {
@@ -190,7 +201,8 @@ class Payment extends Element {
 	 * @param StandingOrderExt|null $standingOrderExt
 	 * @return static
 	 */
-	public function setStandingOrderExt($standingOrderExt) {
+	public function setStandingOrderExt($standingOrderExt)
+	{
 		$this->standingOrderExt = $standingOrderExt;
 		return $this;
 	}
@@ -203,7 +215,8 @@ class Payment extends Element {
 	 * @param DirectDebitExt|null $directDebitExt
 	 * @return static
 	 */
-	public function setDirectDebitExt($directDebitExt) {
+	public function setDirectDebitExt($directDebitExt)
+	{
 		$this->directDebitExt = $directDebitExt;
 		return $this;
 	}
@@ -214,7 +227,8 @@ class Payment extends Element {
 	 *
 	 * @return Pay
 	 */
-	public function createPayDocument() {
+	public function createPayDocument()
+	{
 		return (new Pay())->addPayment($this);
 	}
 

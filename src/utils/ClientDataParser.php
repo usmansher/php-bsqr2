@@ -2,15 +2,14 @@
 
 namespace com\peterbodnar\bsqr\utils;
 
-use com\peterbodnar\bsqr\Exception;
 use com\peterbodnar\bsqr\model;
-
 
 
 /**
  * BySquare client data parser
  */
-class ClientDataParser {
+class ClientDataParser
+{
 
 
 	/** @var string */
@@ -25,13 +24,14 @@ class ClientDataParser {
 	 * @return string
 	 * @throws ParserException
 	 */
-	protected function parseValue($input, &$pos = 0) {
+	protected function parseValue($input, &$pos = 0)
+	{
 		$len = strlen($input);
 		if ($pos >= $len) {
 			throw new ParserException("Unexpected end of input");
 		}
 		$nextSepPos = strpos($input, $this->separator, $pos);
-		if (FALSE === $nextSepPos) {
+		if (false === $nextSepPos) {
 			$result = substr($input, $pos);
 			$pos = $len;
 		} else {
@@ -50,13 +50,14 @@ class ClientDataParser {
 	 * @return int|null
 	 * @throws ParserException
 	 */
-	protected function parseInt($input, &$pos = 0) {
+	protected function parseInt($input, &$pos = 0)
+	{
 		$value = $this->parseValue($input, $pos);
-		if (NULL === $value) {
-			return NULL;
+		if (null === $value) {
+			return null;
 		}
-		$int = (int) $value;
-		if ((string) $int !== $value) {
+		$int = (int)$value;
+		if ((string)$int !== $value) {
 			throw new ParserException();
 		}
 		return $int;
@@ -71,9 +72,10 @@ class ClientDataParser {
 	 * @return int
 	 * @throws ParserException
 	 */
-	protected function parseCount($input, &$pos = 0) {
+	protected function parseCount($input, &$pos = 0)
+	{
 		$int = $this->parseInt($input, $pos);
-		if (NULL === $int || $int < 0) {
+		if (null === $int || $int < 0) {
 			throw new ParserException();
 		}
 		return $int;
@@ -88,12 +90,13 @@ class ClientDataParser {
 	 * @return bool
 	 * @throws ParserException
 	 */
-	protected function parseBool($input, &$pos = 0) {
+	protected function parseBool($input, &$pos = 0)
+	{
 		$val = $this->parseValue($input, $pos);
 		if ("0" !== $val && "1" !== $val) {
 			throw new ParserException();
 		}
-		return (bool) $val;
+		return (bool)$val;
 	}
 
 
@@ -105,12 +108,13 @@ class ClientDataParser {
 	 * @return float|null
 	 * @throws ParserException
 	 */
-	protected function parseFloat($input, &$pos = 0) {
+	protected function parseFloat($input, &$pos = 0)
+	{
 		$value = $this->parseValue($input, $pos);
-		if (NULL === $value) {
-			return NULL;
+		if (null === $value) {
+			return null;
 		}
-		$float = (float) $value;
+		$float = (float)$value;
 		if ($float != $value) {
 			throw new ParserException();
 		}
@@ -126,12 +130,13 @@ class ClientDataParser {
 	 * @return string|null
 	 * @throws ParserException
 	 */
-	protected function parseDate($input, &$pos = 0) {
+	protected function parseDate($input, &$pos = 0)
+	{
 		$value = $this->parseValue($input, $pos);
-		if (NULL === $value) {
-			return NULL;
+		if (null === $value) {
+			return null;
 		} elseif (preg_match("~^([0-9]{4})([0-9]{2})([0-9]{2})$~", $value, $m)) {
-			return "{$m[1]}-{$m[2]}-{$m[3]}";
+			return "$m[1]-$m[2]-$m[3]";
 		}
 		throw new ParserException();
 	}
@@ -145,7 +150,8 @@ class ClientDataParser {
 	 * @return model\BankAccount
 	 * @throws ParserException
 	 */
-	protected function parseBankAccount($input, &$pos = 0) {
+	protected function parseBankAccount($input, &$pos = 0)
+	{
 		$bankAccount = new model\BankAccount($input, $pos);
 		$bankAccount->iban = $this->parseValue($input, $pos);
 		$bankAccount->bic = $this->parseValue($input, $pos);
@@ -153,36 +159,38 @@ class ClientDataParser {
 	}
 
 
-	/**
-	 * Parse standing order extension.
-	 *
-	 * @param string $input - Input string
-	 * @param int& $pos - Cursor position
-	 * @return model\StandingOrderExt
-	 * @throws ParserException
-	 */
-	protected function parseStandingOrderExt($input, &$pos = 0) {
-
-		// todo
-
-		throw new ParserException("Not implemented.");
-	}
-
-
-	/**
-	 * Parse direct debit extension.
-	 *
-	 * @param string $input - Input string
-	 * @param int& $pos - Cursor position
-	 * @return model\DirectDebitExt
-	 * @throws ParserException
-	 */
-	protected function parseDirectDebitExt($input, &$pos = 0) {
-
-		// todo
-
-		throw new ParserException("Not implemented.");
-	}
+	///**
+	// * Parse standing order extension.
+	// *
+	// * @param string $input - Input string
+	// * @param int& $pos - Cursor position
+	// * @return model\StandingOrderExt
+	// * @throws ParserException
+	// */
+	//protected function parseStandingOrderExt($input, &$pos = 0)
+	//{
+	//
+	//	// todo
+	//
+	//	throw new ParserException("Not implemented.");
+	//}
+	//
+	//
+	///**
+	// * Parse direct debit extension.
+	// *
+	// * @param string $input - Input string
+	// * @param int& $pos - Cursor position
+	// * @return model\DirectDebitExt
+	// * @throws ParserException
+	// */
+	//protected function parseDirectDebitExt($input, &$pos = 0)
+	//{
+	//
+	//	// todo
+	//
+	//	throw new ParserException("Not implemented.");
+	//}
 
 
 	/**
@@ -193,17 +201,18 @@ class ClientDataParser {
 	 * @return model\Payment
 	 * @throws ParserException
 	 */
-	protected function parsePayment($input, &$pos = 0) {
+	protected function parsePayment($input, &$pos = 0)
+	{
 		$payment = new model\Payment();
 
 		$options = $this->parseInt($input, $pos);
-		if (NULL === $options) {
+		if (null === $options) {
 			throw new ParserException("Unexpected empty value");
 		}
 
 		// $hasDirectDebitExt = (bool) ($options & 4);
 		// $hasStandingOrderExt = (bool) ($options & 2);
-		$payment->paymentOrderOption = (bool) ($options & 1);
+		$payment->paymentOrderOption = (bool)($options & 1);
 		$payment->amount = $this->parseFloat($input, $pos);
 		$payment->currencyCode = $this->parseValue($input, $pos);
 		$payment->dueDate = $this->parseDate($input, $pos);
@@ -214,15 +223,15 @@ class ClientDataParser {
 		$payment->note = $this->parseValue($input, $pos);
 
 		$bankAccountsCount = $this->parseCount($input, $pos);
-		for ($i=0; $i<$bankAccountsCount; $i++) {
+		for ($i = 0; $i < $bankAccountsCount; $i++) {
 			$payment->bankAccounts[] = $this->parseBankAccount($input, $pos);
 		}
-		if ($this->parseBool($input, $pos)) {
-			$payment->standingOrderExt = $this->parseStandingOrderExt($input, $pos);
-		}
-		if ($this->parseBool($input, $pos)) {
-			$payment->directDebitExt = $this->parseDirectDebitExt($input, $pos);
-		}
+		//if ($this->parseBool($input, $pos)) {
+		//	$payment->standingOrderExt = $this->parseStandingOrderExt($input, $pos);
+		//}
+		//if ($this->parseBool($input, $pos)) {
+		//	$payment->directDebitExt = $this->parseDirectDebitExt($input, $pos);
+		//}
 		return $payment;
 	}
 
@@ -235,12 +244,13 @@ class ClientDataParser {
 	 * @return model\Pay
 	 * @throws ParserException
 	 */
-	protected function parsePay($input, &$pos = 0) {
+	protected function parsePay($input, &$pos = 0)
+	{
 		$pay = new model\Pay();
 
 		$pay->invoiceId = $this->parseValue($input, $pos);
 		$paymentsCount = $this->parseCount($input, $pos);
-		for ($i=0; $i<$paymentsCount; $i++) {
+		for ($i = 0; $i < $paymentsCount; $i++) {
 			$pay->payments[] = $this->parsePayment($input, $pos);
 		}
 		return $pay;
@@ -255,7 +265,8 @@ class ClientDataParser {
 	 * @return model\Document
 	 * @throws ParserException
 	 */
-	public function parse($documentClass, $data) {
+	public function parse($documentClass, $data)
+	{
 		$pos = 0;
 		if (model\Pay::class === $documentClass) {
 			$result = $this->parsePay($data, $pos);
@@ -269,10 +280,3 @@ class ClientDataParser {
 	}
 
 }
-
-
-
-/**
- * Exception thrown when client data parsing error occures
- */
-class ParserException extends Exception { }

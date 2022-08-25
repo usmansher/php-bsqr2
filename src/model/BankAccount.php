@@ -3,11 +3,11 @@
 namespace com\peterbodnar\bsqr\model;
 
 
-
 /**
  * Single bank account.
  */
-class BankAccount extends Element {
+class BankAccount extends Element
+{
 
 
 	/** @var string - IBAN code. */
@@ -20,7 +20,8 @@ class BankAccount extends Element {
 	 * @param string|null $iban
 	 * @param string|null $bic
 	 */
-	public function __construct($iban = NULL, $bic = NULL) {
+	public function __construct($iban = null, $bic = null)
+	{
 		$this->iban = $iban;
 		$this->bic = $bic;
 	}

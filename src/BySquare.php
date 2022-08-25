@@ -12,11 +12,11 @@ use com\peterbodnar\qrcoder\QrCoderException;
 use com\peterbodnar\svg\Svg;
 
 
-
 /**
  * Bysquare facade to encode and render bysqr document
  */
-class BySquare {
+class BySquare
+{
 
 
 	const LOGO_BOTTOM = BsqrRenderer::LOGO_BOTTOM;
@@ -35,7 +35,8 @@ class BySquare {
 	protected $bsqrRenderer;
 
 
-	public function __construct() {
+	public function __construct()
+	{
 		$this->bsqrCoder = new BsqrCoder();
 		$this->qrCoder = new QrCoder();
 		$this->mx2svg = new MxToSvg();
@@ -48,7 +49,8 @@ class BySquare {
 	 *
 	 * @param string $logoPosition - Logo position
 	 */
-	public function setLogoPosition($logoPosition) {
+	public function setLogoPosition($logoPosition)
+	{
 		$this->bsqrRenderer->setLogoPosition($logoPosition);
 	}
 
@@ -60,7 +62,8 @@ class BySquare {
 	 * @return Svg
 	 * @throws BySquareException
 	 */
-	public function render(model\Document $document) {
+	public function render(model\Document $document)
+	{
 		try {
 			$bsqrData = $this->bsqrCoder->encode($document);
 			$qrMatrix = $this->qrCoder->encode($bsqrData);
@@ -85,10 +88,3 @@ class BySquare {
 	}
 
 }
-
-
-
-/**
- * Exception thrown when encoding / rendering error occures.
- */
-class BySquareException extends Exception { }

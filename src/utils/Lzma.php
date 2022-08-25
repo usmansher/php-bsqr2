@@ -2,16 +2,15 @@
 
 namespace com\peterbodnar\bsqr\utils;
 
-use com\peterbodnar\bsqr\Exception;
 use com\peterbodnar\cmd\Command;
 use com\peterbodnar\cmd\CommandException;
-
 
 
 /**
  * BySquare Lzma compressor / decompressor
  */
-class Lzma {
+class Lzma
+{
 
 
 	/** @var Command */
@@ -23,7 +22,8 @@ class Lzma {
 	/**
 	 * @param string $xzPath - Path to xz executable
 	 */
-	public function __construct($xzPath = "/usr/bin/xz") {
+	public function __construct($xzPath = "/usr/bin/xz")
+	{
 		$this->command = new Command($xzPath);
 		$this->xzArgs = [
 			"--format" => "raw",
@@ -39,7 +39,8 @@ class Lzma {
 	 * @return string
 	 * @throws LzmaException
 	 */
-	public function compress($data) {
+	public function compress($data)
+	{
 		$errorMsg = "Data compression failed";
 		$sizeBytesLE = pack("v", strlen($data));
 
@@ -67,7 +68,8 @@ class Lzma {
 	 * @return string
 	 * @throws LzmaException
 	 */
-	public function decompress($data) {
+	public function decompress($data)
+	{
 		$errorMsg = "Data decompression failed";
 		$sizeBytesLE = substr($data, 0, 2);
 		$dataCompressed = substr($data, 2);
@@ -90,10 +92,3 @@ class Lzma {
 	}
 
 }
-
-
-
-/**
- * Exception thrown when lzma compression / decompression error occures
- */
-class LzmaException extends Exception { }
