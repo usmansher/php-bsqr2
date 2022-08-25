@@ -5,11 +5,7 @@ namespace com\peterbodnar\bsqr;
 use com\peterbodnar\bsqr\model;
 use com\peterbodnar\bsqr\utils\BsqrCoder;
 use com\peterbodnar\bsqr\utils\BsqrCoderException;
-use com\peterbodnar\bsqr\utils\BsqrRenderer;
-use com\peterbodnar\mx2svg\MxToSvg;
-use com\peterbodnar\qrcoder\QrCoder;
-use com\peterbodnar\qrcoder\QrCoderException;
-use com\peterbodnar\svg\Svg;
+use Endroid\QrCode\Writer\Result\ResultInterface;
 
 
 /**
@@ -17,74 +13,133 @@ use com\peterbodnar\svg\Svg;
  */
 class BySquare
 {
+	public const LOGO_CENTER = "BOTTOM";
+	public const LOGO_RIGHT = "RIGHT";
+	public const LOGO_LEFT = "LEFT";
 
+	private int $qrSizePx = 300;
+	private string $colorPrimary = "#000000";
+	private string $colorSecondary = "#ffffff";
 
-	const LOGO_BOTTOM = BsqrRenderer::LOGO_BOTTOM;
-	const LOGO_RIGHT = BsqrRenderer::LOGO_RIGHT;
-	const LOGO_TOP = BsqrRenderer::LOGO_TOP;
-	const LOGO_LEFT = BsqrRenderer::LOGO_LEFT;
+	protected BsqrCoder $bsqrCoder;
 
-
-	/** @var BsqrCoder */
-	protected $bsqrCoder;
-	/** @var QrCoder */
-	protected $qrCoder;
-	/** @var MxToSvg */
-	protected $mx2svg;
-	/** @var BsqrRenderer */
-	protected $bsqrRenderer;
+	protected ?\Endroid\QrCode\Label\Alignment\LabelAlignmentInterface $labelPosition = null;
 
 
 	public function __construct()
 	{
 		$this->bsqrCoder = new BsqrCoder();
-		$this->qrCoder = new QrCoder();
-		$this->mx2svg = new MxToSvg();
-		$this->bsqrRenderer = new BsqrRenderer();
 	}
 
 
 	/**
-	 * Set logo position {@see self::LOGO_*}.
+	 * Set logo position
 	 *
 	 * @param string $logoPosition - Logo position
+	 * @throws \Exception
+	 * @see self::LOGO_*.
+	 *
 	 */
-	public function setLogoPosition($logoPosition)
+	public function setLogoPosition(string $logoPosition): void
 	{
-		$this->bsqrRenderer->setLogoPosition($logoPosition);
+		switch ($logoPosition) {
+			case self::LOGO_LEFT:
+				$this->labelPosition = new \Endroid\QrCode\Label\Alignment\LabelAlignmentLeft();
+				break;
+			case self::LOGO_RIGHT:
+				$this->labelPosition = new \Endroid\QrCode\Label\Alignment\LabelAlignmentRight();
+				break;
+			case self::LOGO_CENTER:
+				$this->labelPosition = new \Endroid\QrCode\Label\Alignment\LabelAlignmentCenter();
+				break;
+			default:
+				throw new \Exception(sprintf('Unsupporteed position %s', $logoPosition));
+		}
 	}
 
+	public function setQrSizePx(int $qrSizePx): void
+	{
+		$this->qrSizePx = $qrSizePx;
+	}
+
+	/**
+	 * @param string $colorPrimary
+	 */
+	public function setColorPrimary(string $colorPrimary): void
+	{
+		$this->colorPrimary = $colorPrimary;
+	}
+
+	/**
+	 * @param string $colorSecondary
+	 */
+	public function setColorSecondary(string $colorSecondary): void
+	{
+		$this->colorSecondary = $colorSecondary;
+	}
+
+	/**
+	 * Include svg image by specified name.
+	 *
+	 * @param string $name - Name of svg image
+	 * @return string Svg string
+	 */
+	protected function includeSvg($name): string
+	{
+		$res = file_get_contents(__DIR__ . '/../res/' . $name);
+		return str_replace(["{primary}", "{secondary}"], [$this->colorPrimary, $this->colorSecondary], $res);
+	}
 
 	/**
 	 * Render by square document to svg image.
 	 *
-	 * @param model\Document $document - By Square Document
-	 * @return Svg
+	 * @param model\Pay $document - By Square Document
+	 * @return \Endroid\QrCode\Writer\Result\ResultInterface
 	 * @throws BySquareException
 	 */
-	public function render(model\Document $document)
+	public function render(model\Pay $document): ResultInterface
 	{
+		$tmpLogoFile = sprintf(
+			'.caption_%s_%s.svg',
+			str_replace('#', '', $this->colorPrimary),
+			str_replace('#', '', $this->colorSecondary)
+		);
+
 		try {
 			$bsqrData = $this->bsqrCoder->encode($document);
-			$qrMatrix = $this->qrCoder->encode($bsqrData);
-			$qrSvg = $this->mx2svg->render($qrMatrix);
+
+			$logo = $this->includeSvg('pay-caption.svg');
+			file_put_contents($tmpLogoFile, $logo);
+
+			$qrBuilder = \Endroid\QrCode\Builder\Builder
+				::create()
+				->writer(new \Endroid\QrCode\Writer\SvgWriter())
+				->writerOptions([])
+				->data($bsqrData)
+				->encoding(new \Endroid\QrCode\Encoding\Encoding('UTF-8'))
+				->errorCorrectionLevel(new \Endroid\QrCode\ErrorCorrectionLevel\ErrorCorrectionLevelHigh())
+				->size($this->qrSizePx)
+				->margin(10)
+				->roundBlockSizeMode(new \Endroid\QrCode\RoundBlockSizeMode\RoundBlockSizeModeMargin())
+				->logoPath($tmpLogoFile)
+				->labelText('Pay by Square')
+				->labelFont(new \Endroid\QrCode\Label\Font\NotoSans(20))
+				->labelAlignment($this->labelPosition);
+
+			if (\Symfony\Component\Filesystem\Path::getExtension($tmpLogoFile, true) === 'svg') {
+				$qrBuilder->logoResizeToWidth($this->qrSizePx);
+				$qrBuilder->logoResizeToHeight($this->qrSizePx);
+			}
+
+			return $qrBuilder->build();
 		} catch (BsqrCoderException $ex) {
 			throw new BySquareException("Error while encoding bsqr document: " . $ex->getMessage(), 0, $ex);
-		} catch (QrCoderException $ex) {
+		} catch (\BaconQrCode\Exception\RuntimeException $ex) {
 			throw new BySquareException("Error while encoding data to qr-code matrix: " . $ex->getMessage(), 0, $ex);
-		}
-		$this->bsqrRenderer->setQrCodeSvg($qrSvg);
-		$this->bsqrRenderer->setQuiteAreaRatio(4 / $qrMatrix->getRows());
-		if ($document instanceof model\Pay) {
-			$this->bsqrRenderer->setLogo(BsqrRenderer::LOGO_PAY);
-		} else {
-			throw new BySquareException("Not supported");
-		}
-		try {
-			return $this->bsqrRenderer->render();
-		} catch (BySquareException $ex) {
-			throw new BySquareException("Error while rendering bysquare image: " . $ex->getMessage(), 0, $ex);
+		} finally {
+			if (file_exists($tmpLogoFile)) {
+				unlink($tmpLogoFile);
+			}
 		}
 	}
-
 }

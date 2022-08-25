@@ -36,15 +36,19 @@ class Lzma
 			$command = new \Symfony\Component\Process\Process(
 				[
 					$this->xzPath,
-					'--format' => 'raw',
-					'--lzma1' => 'lc=3,lp=0,pb=2,dict=32KiB',
-					'-c',
-					'-'
-				], null, null,
+					'--format',
+					'raw',
+					'--lzma1=lc=3,lp=0,pb=2,dict=32KiB',
+					'-z',
+					// '-v', // Use for debugging only. Will output information to stderr.
+				],
+				null,
+				null,
 				$data
 			);
 			$exitCode = $command->run();
 			$stdErr = $command->getErrorOutput();
+			$stdOutCompressedBin = $command->getOutput();
 		} catch (\Symfony\Component\Process\Exception\ProcessFailedException $ex) {
 			throw new LzmaException($errorMsg . ": " . $ex->getMessage(), 0, $ex);
 		}
@@ -56,7 +60,7 @@ class Lzma
 			throw new LzmaException($errorMsg);
 		}
 
-		return $sizeBytesLE . $command->getOutput();
+		return $sizeBytesLE . $stdOutCompressedBin;
 	}
 
 
