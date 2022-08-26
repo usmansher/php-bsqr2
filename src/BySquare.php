@@ -22,6 +22,7 @@ class BySquare
 	private string $colorSecondary = "#ffffff";
 
 	protected BsqrCoder $bsqrCoder;
+	protected ?string $bsqrData = null;
 
 	protected ?\Endroid\QrCode\Label\Alignment\LabelAlignmentInterface $labelPosition = null;
 
@@ -78,17 +79,17 @@ class BySquare
 		$this->colorSecondary = $colorSecondary;
 	}
 
-	/**
-	 * Include svg image by specified name.
-	 *
-	 * @param string $name - Name of svg image
-	 * @return string Svg string
-	 */
-	protected function includeSvg($name): string
-	{
-		$res = file_get_contents(__DIR__ . '/../res/' . $name);
-		return str_replace(["{primary}", "{secondary}"], [$this->colorPrimary, $this->colorSecondary], $res);
-	}
+	///**
+	// * Include svg image by specified name.
+	// *
+	// * @param string $name - Name of svg image
+	// * @return string Svg string
+	// */
+	//protected function includeSvg($name): string
+	//{
+	//	$res = file_get_contents(__DIR__ . '/../res/' . $name);
+	//	return str_replace(["{primary}", "{secondary}"], [$this->colorPrimary, $this->colorSecondary], $res);
+	//}
 
 	/**
 	 * Render by square document to svg image.
@@ -106,16 +107,17 @@ class BySquare
 		);
 
 		try {
-			$bsqrData = $this->bsqrCoder->encode($document);
+			$this->bsqrData = $this->bsqrCoder->encode($document);
 
-			$logo = $this->includeSvg('pay-caption.svg');
-			file_put_contents($tmpLogoFile, $logo);
+			//$logo = $this->includeSvg('pay-caption.svg');
+			$tmpLogoFile = __DIR__ . '/../res/' . 'pay-caption.png';
+			//file_put_contents($tmpLogoFile, $logo);
 
 			$qrBuilder = \Endroid\QrCode\Builder\Builder
 				::create()
-				->writer(new \Endroid\QrCode\Writer\SvgWriter())
+				->writer(new \Endroid\QrCode\Writer\PngWriter())
 				->writerOptions([])
-				->data($bsqrData)
+				->data($this->bsqrData)
 				->encoding(new \Endroid\QrCode\Encoding\Encoding('UTF-8'))
 				->errorCorrectionLevel(new \Endroid\QrCode\ErrorCorrectionLevel\ErrorCorrectionLevelHigh())
 				->size($this->qrSizePx)
@@ -137,9 +139,14 @@ class BySquare
 		} catch (\BaconQrCode\Exception\RuntimeException $ex) {
 			throw new BySquareException("Error while encoding data to qr-code matrix: " . $ex->getMessage(), 0, $ex);
 		} finally {
-			if (file_exists($tmpLogoFile)) {
-				unlink($tmpLogoFile);
-			}
+			//if (file_exists($tmpLogoFile)) {
+			//	unlink($tmpLogoFile);
+			//}
 		}
+	}
+
+	public function getQrEncodedData(): ?string
+	{
+		return $this->bsqrData;
 	}
 }

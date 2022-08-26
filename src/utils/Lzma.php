@@ -82,11 +82,9 @@ class Lzma
 			$command = new \Symfony\Component\Process\Process(
 				[
 					$this->xzPath,
-					'--format' => 'raw',
-					'--lzma1' => 'lc=3,lp=0,pb=2,dict=32KiB',
+					'--format' , 'raw',
+					'--lzma1=lc=3,lp=0,pb=2,dict=32KiB',
 					'--decompress',
-					'-c',
-					'-'
 				], null, null,
 				$dataCompressed
 			);

@@ -57,7 +57,7 @@ class BsqrCoder
 			throw new BsqrCoderException("LZMA compression failed: " . $ex->getMessage(), 0, $ex);
 		}
 
-		return \ParagonIE\ConstantTime\Base32::encode($head . $lzmEncoded);
+		return \ParagonIE\ConstantTime\Base32Hex::encode($head . $lzmEncoded);
 	}
 
 
@@ -71,7 +71,7 @@ class BsqrCoder
 	public function parse($input)
 	{
 		try {
-			$b32decoded = \ParagonIE\ConstantTime\Base32::decode($input);
+			$b32decoded = \ParagonIE\ConstantTime\Base32Hex::decode($input);
 		} catch (\Exception $ex) {
 			throw new BsqrCoderException("Base 32 decoding failed: " . $ex->getMessage(), 0, $ex);
 		}

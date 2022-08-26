@@ -43,10 +43,15 @@ class EncodeTest extends \PHPUnit\Framework\TestCase
 		$qrResult = $bySquare->render($document);
 
 
-		$savedImage = \Tests\Util\TestHelper::getOutputDir() . DIRECTORY_SEPARATOR . 'test_qr.svg';
+		$savedImage = \Tests\Util\TestHelper::getOutputDir() . DIRECTORY_SEPARATOR . 'test_qr.png';
 		$qrResult->saveToFile($savedImage);
 
 		$this->assertFileExists($savedImage);
 		$this->assertGreaterThan(30, filesize($savedImage));
+
+		// Reverse test
+		$coder = new \com\peterbodnar\bsqr\utils\BsqrCoder();
+		$document = $coder->parse($bySquare->getQrEncodedData());
+		$this->assertInstanceOf(\com\peterbodnar\bsqr\model\Document::class, $document);
 	}
 }
